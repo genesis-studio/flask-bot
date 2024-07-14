@@ -1,8 +1,7 @@
 import discord
 from discord.ext import commands
-from flask import Flask, jsonify, request
+from quart import Quart, jsonify, request
 import asyncio
-import threading
 import os
 
 # Discord bot setup
@@ -10,28 +9,25 @@ intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix='!', intents=intents)
 
-# Flask app setup
-app = Flask(__name__)
+# Quart app setup
+app = Quart(__name__)
 
 # Discord channel IDs (replace with your actual channel IDs)
 CHANNEL_IDS = {
     'general': 1235297170287231079
 }
 
-# Create an event loop for the bot
-bot_loop = asyncio.new_event_loop()
-
 @bot.event
 async def on_ready():
     print(f'{bot.user} has connected to Discord!')
 
 @app.route('/')
-def index():
-    return jsonify({"Choo Choo": "Welcome to your Flask app 🚅"})
+async def index():
+    return jsonify({"Choo Choo": "Welcome to your Quart app 🚅"})
 
 @app.route('/send_message', methods=['POST'])
-def send_message():
-    data = request.json
+async def send_message():
+    data = await request.json
     channel_name = data.get('channel', 'general')
     
     if channel_name not in CHANNEL_IDS:
@@ -39,8 +35,7 @@ def send_message():
     
     channel_id = CHANNEL_IDS[channel_name]
     
-    # Use run_coroutine_threadsafe correctly
-    future = asyncio.run_coroutine_threadsafe(send_discord_message(
+    await send_discord_message(
         channel_id,
         data.get('novel_title', ''),
         data.get('chapter_number', ''),
@@ -51,10 +46,7 @@ def send_message():
         data.get('free_chapter_id', ''),
         data.get('novel_id', ''),
         data.get('cover', '')
-    ), bot_loop)
-    
-    # Wait for the coroutine to complete
-    future.result()
+    )
     
     return 'Message sent', 200
 
@@ -85,17 +77,13 @@ async def send_discord_message(channel_id, novel_title, chapter_number, chapter_
         message_content = f"{role.mention if role else ''}"
         await channel.send(content=message_content, embed=embed)
 
-def run_discord_bot():
-    asyncio.set_event_loop(bot_loop)
-    bot_loop.run_until_complete(bot.start(os.environ["DISCORD_TOKEN"]))
+async def start_bot():
+    await bot.start(os.environ["DISCORD_TOKEN"])
 
-def run_flask():
-    app.run(debug=True, port=os.getenv("PORT", default=5000))
+@app.before_serving
+async def before_serving():
+    loop = asyncio.get_event_loop()
+    loop.create_task(start_bot())
 
 if __name__ == '__main__':
-    # Start Discord bot in a separate thread
-    discord_thread = threading.Thread(target=run_discord_bot)
-    discord_thread.start()
-    
-    # Run Flask in the main thread
-    run_flask()
+    app.run(debug=True, port=int(os.getenv("PORT", 5000)))
