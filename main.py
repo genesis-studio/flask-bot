@@ -18,6 +18,9 @@ CHANNEL_IDS = {
     'general': 1235297170287231079
 }
 
+# Create an event loop for the bot
+bot_loop = asyncio.new_event_loop()
+
 @bot.event
 async def on_ready():
     print(f'{bot.user} has connected to Discord!')
@@ -36,7 +39,8 @@ def send_message():
     
     channel_id = CHANNEL_IDS[channel_name]
     
-    asyncio.run_coroutine_threadsafe(send_discord_message(
+    # Use run_coroutine_threadsafe correctly
+    future = asyncio.run_coroutine_threadsafe(send_discord_message(
         channel_id,
         data.get('novel_title', ''),
         data.get('chapter_number', ''),
@@ -47,7 +51,11 @@ def send_message():
         data.get('free_chapter_id', ''),
         data.get('novel_id', ''),
         data.get('cover', '')
-    ), bot.loop)
+    ), bot_loop)
+    
+    # Wait for the coroutine to complete
+    future.result()
+    
     return 'Message sent', 200
 
 async def send_discord_message(channel_id, novel_title, chapter_number, chapter_title, chapter_id, free_chapter_number, free_chapter_title, free_chapter_id, novel_id, cover_id):
@@ -77,13 +85,17 @@ async def send_discord_message(channel_id, novel_title, chapter_number, chapter_
         message_content = f"{role.mention if role else ''}"
         await channel.send(content=message_content, embed=embed)
 
+def run_discord_bot():
+    asyncio.set_event_loop(bot_loop)
+    bot_loop.run_until_complete(bot.start(os.environ["DISCORD_TOKEN"]))
+
 def run_flask():
     app.run(debug=True, port=os.getenv("PORT", default=5000))
 
 if __name__ == '__main__':
-    # Start Flask in a separate thread
-    flask_thread = threading.Thread(target=run_flask)
-    flask_thread.start()
+    # Start Discord bot in a separate thread
+    discord_thread = threading.Thread(target=run_discord_bot)
+    discord_thread.start()
     
-    # Run the Discord bot
-    bot.run(os.environ["DISCORD_TOKEN"])
+    # Run Flask in the main thread
+    run_flask()
