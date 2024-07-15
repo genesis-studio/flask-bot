@@ -14,7 +14,8 @@ app = Quart(__name__)
 
 # Discord channel IDs (replace with your actual channel IDs)
 CHANNEL_IDS = {
-    'test-release':1262212983426125835
+    'test-release':1262212983426125835,
+    'release': 1219457468011380892
 }
 
 @bot.event
