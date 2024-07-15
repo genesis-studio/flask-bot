@@ -92,8 +92,8 @@ async def send_discord_message(channel_id, novel_title, chapter_number, chapter_
         
         embed = discord.Embed(color=embed_color)
         
-        embed.title = f"[{novel_title}](https://genesistudio.com/novels/{abbreviation})"
-        embed.description = f"Premium Chapter:\n[{chapter_number} - {chapter_title}](https://genesistudio.com/viewer/{chapter_id})\n\n Free Chapter:\n[{free_chapter_number} - {free_chapter_title}](https://genesistudio.com/viewer/{free_chapter_id})"
+        embed.title = novel_title
+        embed.description = f"Premium Chapter:\n[{chapter_number} - {chapter_title}](https://genesistudio.com/viewer/{chapter_id})\n\n Free Chapter:\n[{free_chapter_number} - {free_chapter_title}](https://genesistudio.com/viewer/{free_chapter_id})\n\n[Read Here](https://genesistudio.com/novels/{abbreviation})"
         
         if cover_id:
             cover_url = f"https://edit.genesistudio.com/assets/{cover_id}"
