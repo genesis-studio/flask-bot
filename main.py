@@ -46,12 +46,13 @@ async def send_message():
         data.get('free_chapter_title', ''),
         data.get('free_chapter_id', ''),
         data.get('novel_id', ''),
-        data.get('cover', '')
+        data.get('cover', ''),
+        data.get('abbreviation', '')
     )
     
     return 'Message sent', 200
 
-async def send_discord_message(channel_id, novel_title, chapter_number, chapter_title, chapter_id, free_chapter_number, free_chapter_title, free_chapter_id, novel_id, cover_id):
+async def send_discord_message(channel_id, novel_title, chapter_number, chapter_title, chapter_id, free_chapter_number, free_chapter_title, free_chapter_id, novel_id, cover_id, abbreviation):
     channel = bot.get_channel(channel_id)
     if channel:
         # Define novel_id to role_id and color mapping
@@ -91,7 +92,7 @@ async def send_discord_message(channel_id, novel_title, chapter_number, chapter_
         
         embed = discord.Embed(color=embed_color)
         
-        embed.title = novel_title
+        embed.title = f"[{novel_title}](https://genesistudio.com/novels/{abbreviation})"
         embed.description = f"Premium Chapter:\n[{chapter_number} - {chapter_title}](https://genesistudio.com/viewer/{chapter_id})\n\n Free Chapter:\n[{free_chapter_number} - {free_chapter_title}](https://genesistudio.com/viewer/{free_chapter_id})"
         
         if cover_id:
