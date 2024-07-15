@@ -14,7 +14,6 @@ app = Quart(__name__)
 
 # Discord channel IDs (replace with your actual channel IDs)
 CHANNEL_IDS = {
-    'general': 1235297170287231079,
     'test-release':1262212983426125835
 }
 
