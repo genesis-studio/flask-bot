@@ -75,6 +75,7 @@ async def send_discord_message(channel_id, novel_title, chapter_number, chapter_
             'a7e499f7-fa6b-4d86-8ee6-1bf6772890f5': {'role_id': 1219457467872968744, 'color': discord.Color.from_rgb(246, 186, 16)},  # Childhood Friend of the Zenith
             'b92c8a56-9538-42e5-9428-0d55a0e1becc': {'role_id': 1219457467793145957, 'color': discord.Color.from_rgb(87, 87, 109)},  # The Heaven-Slaying Sword
             'c0018319-9173-4cc8-9aed-27db5b33fbd0': {'role_id': 1219457467675836435, 'color': discord.Color.from_rgb(17, 16, 16)},  # Becoming Professor Moriarty's Probability
+            'cd2b58ae-61d3-4cac-9801-2f51e7ec9832': {'role_id': 1266038045111488636, 'color': discord.Color.from_str('#243057')},  # I Will Stage A Coup D'état
             'd63886fd-b00b-426c-ba94-f5f7186c89d9': {'role_id': 1244241901616627773, 'color': discord.Color.from_rgb(32, 102, 148)},  # The Magic Academy's Physicist
             'e1ee79a1-35f4-40e4-8c0d-f54cb6e1be81': {'role_id': 1219457467847544928, 'color': discord.Color.from_rgb(46, 204, 113)},  # The Villain Who Robbed the Heroines
             'e5cd1c8b-af3d-4975-8166-8865092d2a6a': {'role_id': 1219457467847544927, 'color': discord.Color.from_rgb(140, 234, 246)},  # The Main Heroines are Trying to Kill Me
