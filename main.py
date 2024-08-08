@@ -81,6 +81,7 @@ async def send_discord_message(channel_id, novel_title, chapter_number, chapter_
             'e5cd1c8b-af3d-4975-8166-8865092d2a6a': {'role_id': 1219457467847544927, 'color': discord.Color.from_rgb(140, 234, 246)},  # The Main Heroines are Trying to Kill Me
             'f1cc7b93-ba56-4cf0-9d33-26e62e17c395': {'role_id': 1219457467793145964, 'color': discord.Color.from_rgb(113, 54, 138)},  # Otherworld TRPG Game Master
             'fb2cfad1-9b49-40be-83f5-8cbcd706b0bf': {'role_id': 1219457467793145961, 'color': discord.Color.from_rgb(185, 20, 226)},  # A Love Letter From The Future
+            '6bd89693-9b52-486d-8239-1174bab2f14d': {'role_id': 1270002466536296570, 'color': discord.Color.from_rgb(142, 14, 10)},  # A Love Letter From The Future
         }
         
         role_info = role_map.get(novel_id, {})
