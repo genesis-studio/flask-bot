@@ -82,6 +82,9 @@ async def send_discord_message(channel_id, novel_title, chapter_number, chapter_
             'f1cc7b93-ba56-4cf0-9d33-26e62e17c395': {'role_id': 1219457467793145964, 'color': discord.Color.from_rgb(113, 54, 138)},  # Otherworld TRPG Game Master
             'fb2cfad1-9b49-40be-83f5-8cbcd706b0bf': {'role_id': 1219457467793145961, 'color': discord.Color.from_rgb(185, 20, 226)},  # A Love Letter From The Future
             '6bd89693-9b52-486d-8239-1174bab2f14d': {'role_id': 1270002466536296570, 'color': discord.Color.from_rgb(142, 14, 10)},  # A Love Letter From The Future
+            '659953bd-5229-457b-85a2-3252758f5ae2': {'role_id': 1280514452655181874, 'color': discord.Color.from_rgb(75, 255, 87)},  # Training-Addicted Mage
+            'd982a380-b96a-4d38-a2a9-9c4aa18d8570': {'role_id': 1281334118566858812, 'color': discord.Color.from_rgb(253, 255, 153)},  # Forsaken Priest
+            '38d35afc-8fb1-412e-9818-9f9f3e0bd1c1': {'role_id': 1278204780421845004, 'color': discord.Color.from_rgb(66, 0, 114)},  # Freed Slaves
         }
         
         role_info = role_map.get(novel_id, {})
