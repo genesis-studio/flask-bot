@@ -85,6 +85,7 @@ async def send_discord_message(channel_id, novel_title, chapter_number, chapter_
             '659953bd-5229-457b-85a2-3252758f5ae2': {'role_id': 1280514452655181874, 'color': discord.Color.from_rgb(75, 255, 87)},  # Training-Addicted Mage
             'd982a380-b96a-4d38-a2a9-9c4aa18d8570': {'role_id': 1281334118566858812, 'color': discord.Color.from_rgb(253, 255, 153)},  # Forsaken Priest
             '38d35afc-8fb1-412e-9818-9f9f3e0bd1c1': {'role_id': 1278204780421845004, 'color': discord.Color.from_rgb(66, 0, 114)},  # Freed Slaves
+            '7aec4e03-4c3d-4890-acfc-31192d133b95': {'role_id': 1281795492166242334, 'color': discord.Color.from_rgb(0, 191, 201)}
         }
         
         role_info = role_map.get(novel_id, {})
