@@ -132,8 +132,8 @@ async def post_to_reddit(novel_title, chapter_number, chapter_title, chapter_id,
     # Reddit API credentials
     client_id = 'UUK_7Pmi2Jp-DwPmxIBwNw'
     client_secret = 'VvmTpY4BR0JRArus_3Vfcpx--dhXBg'
-    username = '_Ilias__'
-    password = 'ejEXvPgGcEZu04d'
+    username = 'genesis_studio'
+    password = 'GenesisStudioTL13!'
     user_agent = 'Genesis/0.1'
 
     # Initialize the Reddit instance
