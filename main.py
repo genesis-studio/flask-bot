@@ -147,17 +147,16 @@ async def post_to_reddit(novel_title, chapter_number, chapter_title, chapter_id,
 
     subreddit_name = 'GenesisStudio'
     title = f"New Release: {novel_title}"
-    content = f"""
-    New chapters for {novel_title} are now available!
-
-    Premium Chapter:
-    [{chapter_number} - {chapter_title}](https://genesistudio.com/viewer/{chapter_id})
-
-    Free Chapter:
-    [{free_chapter_number} - {free_chapter_title}](https://genesistudio.com/viewer/{free_chapter_id})
-
-    Read more at: https://genesistudio.com/novels/{abbreviation}
-    """
+    content = (
+        f"New chapters for {novel_title} are now available!\n\n"
+        f"Premium Chapter:\n"
+        f"{chapter_number} - {chapter_title}\n"
+        f"https://genesistudio.com/viewer/{chapter_id}\n\n"
+        f"Free Chapter:\n"
+        f"{free_chapter_number} - {free_chapter_title}\n"
+        f"https://genesistudio.com/viewer/{free_chapter_id}\n\n"
+        f"Read more at: https://genesistudio.com/novels/{abbreviation}"
+    )
 
     try:
         # Get the subreddit
