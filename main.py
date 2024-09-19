@@ -120,11 +120,11 @@ async def send_discord_message(channel_id, novel_title, chapter_number, chapter_
 
         # Post to Reddit only if praw is available
         if PRAW_AVAILABLE:
-            await post_to_reddit(novel_title, chapter_number, chapter_title, chapter_id, free_chapter_number, free_chapter_title, free_chapter_id, abbreviation)
+            await post_to_reddit(novel_title, chapter_number, chapter_title, chapter_id, free_chapter_number, free_chapter_title, free_chapter_id, abbreviation, cover_id)
         else:
             print("Skipping Reddit post due to missing praw module.")
 
-async def post_to_reddit(novel_title, chapter_number, chapter_title, chapter_id, free_chapter_number, free_chapter_title, free_chapter_id, abbreviation):
+async def post_to_reddit(novel_title, chapter_number, chapter_title, chapter_id, free_chapter_number, free_chapter_title, free_chapter_id, abbreviation, cover_id):
     if not PRAW_AVAILABLE:
         print("Cannot post to Reddit: praw module is not available.")
         return
@@ -163,7 +163,11 @@ async def post_to_reddit(novel_title, chapter_number, chapter_title, chapter_id,
         subreddit = reddit.subreddit(subreddit_name)
         
         # Create the post
-        post = subreddit.submit(title=title, selftext=content)
+        if cover_id:
+            cover_url = f"https://edit.genesistudio.com/assets/{cover_id}"
+            post = subreddit.submit(title=title, selftext=content, url=cover_url)
+        else:
+            post = subreddit.submit(title=title, selftext=content)
         
         print(f"Reddit post created successfully! URL: {post.url}")
     except praw.exceptions.RedditAPIException as e:
