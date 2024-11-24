@@ -93,8 +93,9 @@ async def send_discord_message(channel_id, novel_title, chapter_number, chapter_
             '659953bd-5229-457b-85a2-3252758f5ae2': {'role_id': 1280514452655181874, 'color': discord.Color.from_rgb(75, 255, 87)},  # Training-Addicted Mage
             'd982a380-b96a-4d38-a2a9-9c4aa18d8570': {'role_id': 1281334118566858812, 'color': discord.Color.from_rgb(253, 255, 153)},  # Forsaken Priest
             '38d35afc-8fb1-412e-9818-9f9f3e0bd1c1': {'role_id': 1278204780421845004, 'color': discord.Color.from_rgb(66, 0, 114)},  # Freed Slaves
-            '7aec4e03-4c3d-4890-acfc-31192d133b95': {'role_id': 1281795492166242334, 'color': discord.Color.from_rgb(0, 191, 201)},
-            '8309d7bf-b359-431e-9e5e-a8cc738c81c9': {'role_id': 1307034721758478357, 'color': discord.Color.from_rgb(248, 131, 121)}
+            '7aec4e03-4c3d-4890-acfc-31192d133b95': {'role_id': 1281795492166242334, 'color': discord.Color.from_rgb(0, 191, 201)}, # 30 Years After Reincarnating
+            '8309d7bf-b359-431e-9e5e-a8cc738c81c9': {'role_id': 1307034721758478357, 'color': discord.Color.from_rgb(248, 131, 121)}, # Martial Arts Ain't Anything
+            '78886d07-3f97-4ff4-93e5-45651c43c1af': {'role_id': 1309727818845786166, 'color': discord.Color.from_rgb(255, 215, 0)}, # The Barbarian Writer of a Murim Dating Sim
         }
         
         role_info = role_map.get(novel_id, {})
