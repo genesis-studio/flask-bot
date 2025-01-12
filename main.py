@@ -97,6 +97,7 @@ async def send_discord_message(channel_id, novel_title, chapter_number, chapter_
             '8309d7bf-b359-431e-9e5e-a8cc738c81c9': {'role_id': 1307034721758478357, 'color': discord.Color.from_rgb(248, 131, 121)}, # Martial Arts Ain't Anything
             '78886d07-3f97-4ff4-93e5-45651c43c1af': {'role_id': 1309727818845786166, 'color': discord.Color.from_rgb(255, 215, 0)}, # The Barbarian Writer of a Murim Dating Sim
             '3a6bf66a-1a24-444c-958f-52fb2fc36ec8': {'role_id': 1322214156811767898, 'color': discord.Color.from_rgb(229, 43, 80)},  # Make Dark Fantasy Great Again
+            '41bf5bdf-226e-4dec-9397-0c4ae3e1e738': {'role_id': 1328001121054101504, 'color': discord.Color.from_rgb(171, 4, 0)},  # Son-In-Law
         }
         
         role_info = role_map.get(novel_id, {})
