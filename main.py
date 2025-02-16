@@ -79,8 +79,8 @@ async def send_discord_message(channel_id, novel_title, chapter_number, chapter_
             '1476685b-badc-4fe1-a962-5517f4b23363': {'role_id': 1219457467793145959, 'color': discord.Color.from_rgb(192, 192, 192)},  # Civil Servant in Romance Fantasy
             '222a1192-5471-48a5-a22c-d5277ba03df8': {'role_id': 1219457467793145963, 'color': discord.Color.from_rgb(141, 57, 255)},  # I Became The Necromancer Of The Academy
             '3135a8c6-f426-4eca-9c9e-2c5011766f81': {'role_id': 1219457467847544924, 'color': discord.Color.from_rgb(67, 100, 255)},  # I Am This Murim's Crazy Bitch
-            '3bc6a1f0-2b1b-4ee6-a377-13be0bc67b87': {'role_id': 1219457467872968742, 'color': discord.Color.from_rgb(212, 238, 15)},  # The Regressor and the Blind Saint
-            '3fecc06f-57f1-4f6e-8fff-cf109de39e88': {'role_id': 1219457467793145962, 'color': discord.Color.from_rgb(212, 99, 193)},  # I Unknowingly Rejected My Favorite
+            # '3bc6a1f0-2b1b-4ee6-a377-13be0bc67b87': {'role_id': 1219457467872968742, 'color': discord.Color.from_rgb(212, 238, 15)},  # The Regressor and the Blind Saint
+            # '3fecc06f-57f1-4f6e-8fff-cf109de39e88': {'role_id': 1219457467793145962, 'color': discord.Color.from_rgb(212, 99, 193)},  # I Unknowingly Rejected My Favorite
             '4db280ca-8ce5-4464-afc7-2079c17e6d5e': {'role_id': 1219457467872968747, 'color': discord.Color.from_rgb(255, 0, 4)},  # Escaping the Mystery Hotel
             '5535a77a-9375-4882-8766-8388348abc4c': {'role_id': 1219457467847544931, 'color': discord.Color.from_rgb(133, 223, 204)},  # The Academy's Weakest Became A Demon-Limited Hunter
             '6468040e-a86a-44f8-a14a-7067418fe0a1': {'role_id': 1219457467872968743, 'color': discord.Color.from_rgb(218, 214, 47)},  # Omniscient First-Person's Viewpoint
@@ -88,7 +88,7 @@ async def send_discord_message(channel_id, novel_title, chapter_number, chapter_
             '69d6ab1d-4da5-4e84-8ffb-190308540908': {'role_id': 1219457467847544929, 'color': discord.Color.from_rgb(62, 226, 159)},  # Seoul Object Story
             '827757d8-161c-441b-8240-f4dbd7407ce4': {'role_id': 1219457467793145965, 'color': discord.Color.from_rgb(164, 114, 230)},  # My Daughters Are Regressors
             '8da58504-bee5-4807-804a-23215c8a4e7e': {'role_id': 1219457467847544930, 'color': discord.Color.from_rgb(26, 188, 156)},  # City of Witches
-            '94683b45-439b-424a-b7f6-76154bcd8750': {'role_id': 1219457467847544923, 'color': discord.Color.from_rgb(13, 108, 223)},  # Pseudo Resident's Illegal Stay in Another World
+            # '94683b45-439b-424a-b7f6-76154bcd8750': {'role_id': 1219457467847544923, 'color': discord.Color.from_rgb(13, 108, 223)},  # Pseudo Resident's Illegal Stay in Another World
             '9fe66022-d209-4d2c-9397-beb256982883': {'role_id': 1244241518437601321, 'color': discord.Color.from_rgb(230, 126, 34)},  # Transmigrated Into A Tragic Romance Fantasy
             'a7e499f7-fa6b-4d86-8ee6-1bf6772890f5': {'role_id': 1219457467872968744, 'color': discord.Color.from_rgb(246, 186, 16)},  # Childhood Friend of the Zenith
             'b92c8a56-9538-42e5-9428-0d55a0e1becc': {'role_id': 1219457467793145957, 'color': discord.Color.from_rgb(87, 87, 109)},  # The Heaven-Slaying Sword
