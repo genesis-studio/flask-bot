@@ -42,6 +42,8 @@ class AnalyticsWorker:
         
         if not all([self.supabase_url, self.supabase_anon_key, self.posthog_api_key, self.posthog_project_id]):
             raise ValueError("Missing required environment variables")
+        
+        print(f"[INIT] Initialized with PostHog project ID: {self.posthog_project_id}")
 
     async def run_analytics(self):
         """Main function that replicates the Deno analytics function"""
@@ -157,19 +159,25 @@ class AnalyticsWorker:
             # Prepare insight creation tasks
             tasks = []
             
-            # Overall insight
-            if not novel.insight_id:
+            # Overall insight - only create if no insight_id exists
+            if not novel.insight_id or novel.insight_id.strip() == '':
+                print(f"[NOVEL] Creating overall insight for {novel.novel_title} (no insight_id)")
                 tasks.append({
                     'type': 'overall',
                     'task': self.create_insight(novel, novel_chapters, 'Page Views', 'all', 'week', session)
                 })
+            else:
+                print(f"[NOVEL] Skipping overall insight creation for {novel.novel_title} (has insight_id: {novel.insight_id})")
             
-            # Weekly insight (only if enabled)
-            if ENABLE_WEEKLY_UPDATES and not novel.insight_id_weekly:
+            # Weekly insight (only if enabled) - only create if no insight_id_weekly exists
+            if ENABLE_WEEKLY_UPDATES and (not novel.insight_id_weekly or novel.insight_id_weekly.strip() == ''):
+                print(f"[NOVEL] Creating weekly insight for {novel.novel_title} (no insight_id_weekly)")
                 tasks.append({
                     'type': 'weekly',
                     'task': self.create_insight(novel, novel_chapters, 'Weekly Page Views (7-day)', '-7d', 'day', session)
                 })
+            elif ENABLE_WEEKLY_UPDATES:
+                print(f"[NOVEL] Skipping weekly insight creation for {novel.novel_title} (has insight_id_weekly: {novel.insight_id_weekly})")
             
             # Execute insight creation with concurrency limit
             created_insights = await self.execute_with_concurrency_limit(tasks, MAX_CONCURRENT_REQUESTS)
@@ -210,12 +218,22 @@ class AnalyticsWorker:
                 novel_updates = {}
                 for result in insight_results:
                     print(f"[NOVEL] Result: {result}")
-                    if result.get('status') == 'fulfilled' and result.get('value', {}).get('data', {}).get('trend'):
+                    if (result.get('status') == 'fulfilled' and 
+                        result.get('value') is not None and 
+                        result.get('value', {}).get('data') is not None and 
+                        result.get('value', {}).get('data', {}).get('trend') is not None):
+                        
                         total_views = self.calculate_total_views(result['value']['data']['trend'])
                         if result['value']['type'] == 'overall':
                             novel_updates['total_views'] = total_views
+                            print(f"[NOVEL] Updated overall views for {novel.novel_title}: {total_views}")
                         elif result['value']['type'] == 'weekly':
                             novel_updates['page_views'] = total_views
+                            print(f"[NOVEL] Updated weekly views for {novel.novel_title}: {total_views}")
+                    elif result.get('status') == 'fulfilled' and result.get('value') is None:
+                        print(f"[NOVEL] No data returned for {novel.novel_title} - insight may not exist")
+                    else:
+                        print(f"[NOVEL] Failed to process result for {novel.novel_title}: {result.get('reason', 'Unknown error')}")
                 
                 if novel_updates:
                     await self.update_novel(novel.id, novel_updates, session)
@@ -341,12 +359,13 @@ class AnalyticsWorker:
             }
             
             
-            print("Going to fetch insight data: ", f'https://app.posthog.com/api/projects/{self.posthog_project_id}/insights/?short_id={insight_id}&refresh=force_blocking')
-            async with session.get(
-                f'https://app.posthog.com/api/projects/{self.posthog_project_id}/insights/?short_id={insight_id}&refresh=force_blocking',
-                headers=headers
-            ) as response:
-                if response.status != 200:
+            url = f'https://app.posthog.com/api/projects/{self.posthog_project_id}/insights/?short_id={insight_id}&refresh=force_blocking'
+            print(f"[FETCH_INSIGHT] URL: {url}")
+            async with session.get(url, headers=headers) as response:
+                if response.status == 404:
+                    print(f"[FETCH_INSIGHT] Insight {insight_id} not found (404) - may have been deleted")
+                    return None
+                elif response.status != 200:
                     raise Exception(f"Failed to fetch insight: {response.status}")
                 
                 data = await response.json()
