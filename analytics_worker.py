@@ -5,6 +5,7 @@ import time
 from typing import List, Dict, Any, Optional
 import json
 from dataclasses import dataclass
+from supabase import create_client, Client
 
 # Constants
 BASE_URL = "https://genesistudio.com"
@@ -43,6 +44,9 @@ class AnalyticsWorker:
         if not all([self.supabase_url, self.supabase_anon_key, self.posthog_api_key, self.posthog_project_id]):
             raise ValueError("Missing required environment variables")
         
+        # Initialize Supabase client
+        self.supabase: Client = create_client(self.supabase_url, self.supabase_anon_key)
+        
         print(f"[INIT] Initialized with PostHog project ID: {self.posthog_project_id}")
 
     async def run_analytics(self):
@@ -55,8 +59,8 @@ class AnalyticsWorker:
                 # Fetch all data in parallel
                 print("[MAIN] Fetching novels and chapters in parallel...")
                 novels_data, chapters_data = await asyncio.gather(
-                    self.fetch_novels(session),
-                    self.fetch_chapters(session)
+                    self.fetch_novels(),
+                    self.fetch_chapters()
                 )
                 
                 novels = [Novel(**novel) for novel in novels_data]
@@ -80,7 +84,7 @@ class AnalyticsWorker:
                 
                 # Update rankings
                 print("[MAIN] Updating rankings...")
-                await self.update_rankings(session)
+                await self.update_rankings()
                 
                 # Cleanup orphaned insights if enabled
                 if ENABLE_ORPHANED_INSIGHTS_CLEANUP:
@@ -101,41 +105,21 @@ class AnalyticsWorker:
             print(f"[MAIN] Error: {str(error)}")
             return {"error": str(error)}
 
-    async def fetch_novels(self, session: aiohttp.ClientSession) -> List[Dict]:
+    async def fetch_novels(self) -> List[Dict]:
         """Fetch novels from Supabase"""
-        url = f"{self.supabase_url}rest/v1/novels"
-        headers = {
-            'Authorization': f'Bearer {self.supabase_anon_key}',
-            'apikey': self.supabase_anon_key,
-            'Content-Type': 'application/json'
-        }
-        params = {
-            'select': 'id,abbreviation,insight_id,insight_id_weekly,novel_title,total_views,page_views,status,serialization',
-            'status': 'eq.published'
-        }
-        
-        async with session.get(url, headers=headers, params=params) as response:
-            if response.status != 200:
-                raise Exception(f"Error fetching novels: {response.status}")
-            return await response.json()
+        try:
+            response = self.supabase.table('novels').select('id,abbreviation,insight_id,insight_id_weekly,novel_title,total_views,page_views,status,serialization').eq('status', 'published').execute()
+            return response.data
+        except Exception as e:
+            raise Exception(f"Error fetching novels: {str(e)}")
 
-    async def fetch_chapters(self, session: aiohttp.ClientSession) -> List[Dict]:
+    async def fetch_chapters(self) -> List[Dict]:
         """Fetch chapters from Supabase"""
-        url = f"{self.supabase_url}rest/v1/chapters"
-        headers = {
-            'Authorization': f'Bearer {self.supabase_anon_key}',
-            'apikey': self.supabase_anon_key,
-            'Content-Type': 'application/json'
-        }
-        params = {
-            'select': 'id,novel',
-            'status': 'eq.released'
-        }
-        
-        async with session.get(url, headers=headers, params=params) as response:
-            if response.status != 200:
-                raise Exception(f"Error fetching chapters: {response.status}")
-            return await response.json()
+        try:
+            response = self.supabase.table('chapters').select('id,novel').eq('status', 'released').execute()
+            return response.data
+        except Exception as e:
+            raise Exception(f"Error fetching chapters: {str(e)}")
 
     async def process_batched_novels(self, novels: List[Novel], chapters_by_novel: Dict, session: aiohttp.ClientSession):
         """Process novels in batches with concurrency control"""
@@ -192,7 +176,7 @@ class AnalyticsWorker:
                         updates['insight_id_weekly'] = result['value']['insightId']
             
             if updates:
-                await self.update_novel(novel.id, updates, session)
+                await self.update_novel(novel.id, updates)
             
             # Fetch insight data for existing insights
             fetch_tasks = []
@@ -217,7 +201,7 @@ class AnalyticsWorker:
                 # Process results and update novel views
                 novel_updates = {}
                 for result in insight_results:
-                    print(f"[NOVEL] Result: {result}")
+                    # print(f"[NOVEL] Result: {result}")
                     if (result.get('status') == 'fulfilled' and 
                         result.get('value') is not None and 
                         result.get('value', {}).get('data') is not None and 
@@ -236,7 +220,7 @@ class AnalyticsWorker:
                         print(f"[NOVEL] Failed to process result for {novel.novel_title}: {result.get('reason', 'Unknown error')}")
                 
                 if novel_updates:
-                    await self.update_novel(novel.id, novel_updates, session)
+                    await self.update_novel(novel.id, novel_updates)
             
             return {"success": True, "novel": novel.id}
             
@@ -397,27 +381,20 @@ class AnalyticsWorker:
             print(f"[FETCH_INSIGHT] Error: {str(error)}")
             return None
 
-    async def update_novel(self, novel_id: str, updates: Dict, session: aiohttp.ClientSession):
+    async def update_novel(self, novel_id: str, updates: Dict):
         """Update novel in Supabase"""
-        url = f"{self.supabase_url}rest/v1/novels"
-        headers = {
-            'Authorization': f'Bearer {self.supabase_anon_key}',
-            'apikey': self.supabase_anon_key,
-            'Content-Type': 'application/json',
-            'Prefer': 'return=minimal'
-        }
-        params = {'id': f'eq.{novel_id}'}
-        
-        async with session.patch(url, headers=headers, params=params, json=updates) as response:
-            if response.status not in [200, 204]:
-                raise Exception(f"Failed to update novel: {response.status}")
+        try:
+            response = self.supabase.table('novels').update(updates).eq('id', novel_id).execute()
+            print(f"[UPDATE_NOVEL] Updated novel {novel_id} with {updates}")
+        except Exception as e:
+            raise Exception(f"Failed to update novel: {str(e)}")
 
-    async def update_rankings(self, session: aiohttp.ClientSession):
+    async def update_rankings(self):
         """Update novel rankings"""
         try:
             # Clear existing rankings and fetch novels in parallel
-            await self.clear_rankings(session)
-            novels_data = await self.fetch_novels_for_ranking(session)
+            await self.clear_rankings()
+            novels_data = await self.fetch_novels_for_ranking()
             
             rankings = []
             
@@ -444,58 +421,34 @@ class AnalyticsWorker:
             
             # Batch insert rankings
             if rankings:
-                await self.insert_rankings(rankings, session)
+                await self.insert_rankings(rankings)
             
             print(f"[RANKINGS] Updated {len(rankings)} ranking entries")
             
         except Exception as error:
             print(f"[RANKINGS] Error: {str(error)}")
 
-    async def clear_rankings(self, session: aiohttp.ClientSession):
+    async def clear_rankings(self):
         """Clear existing rankings"""
-        url = f"{self.supabase_url}rest/v1/popular"
-        headers = {
-            'Authorization': f'Bearer {self.supabase_anon_key}',
-            'apikey': self.supabase_anon_key,
-            'Content-Type': 'application/json'
-        }
-        params = {'id': 'neq.0'}
-        
-        async with session.delete(url, headers=headers, params=params) as response:
-            if response.status not in [200, 204]:
-                raise Exception(f"Failed to clear rankings: {response.status}")
+        try:
+            response = self.supabase.table('popular').delete().neq('id', 0).execute()
+        except Exception as e:
+            raise Exception(f"Failed to clear rankings: {str(e)}")
 
-    async def fetch_novels_for_ranking(self, session: aiohttp.ClientSession):
+    async def fetch_novels_for_ranking(self):
         """Fetch novels for ranking"""
-        url = f"{self.supabase_url}rest/v1/novels"
-        headers = {
-            'Authorization': f'Bearer {self.supabase_anon_key}',
-            'apikey': self.supabase_anon_key,
-            'Content-Type': 'application/json'
-        }
-        params = {
-            'select': 'id,total_views,page_views',
-            'status': 'eq.published'
-        }
-        
-        async with session.get(url, headers=headers, params=params) as response:
-            if response.status != 200:
-                raise Exception(f"Failed to fetch novels for ranking: {response.status}")
-            return await response.json()
+        try:
+            response = self.supabase.table('novels').select('id,total_views,page_views').eq('status', 'published').execute()
+            return response.data
+        except Exception as e:
+            raise Exception(f"Failed to fetch novels for ranking: {str(e)}")
 
-    async def insert_rankings(self, rankings: List[Dict], session: aiohttp.ClientSession):
+    async def insert_rankings(self, rankings: List[Dict]):
         """Insert rankings into Supabase"""
-        url = f"{self.supabase_url}rest/v1/popular"
-        headers = {
-            'Authorization': f'Bearer {self.supabase_anon_key}',
-            'apikey': self.supabase_anon_key,
-            'Content-Type': 'application/json',
-            'Prefer': 'return=minimal'
-        }
-        
-        async with session.post(url, headers=headers, json=rankings) as response:
-            if response.status not in [200, 201]:
-                raise Exception(f"Failed to insert rankings: {response.status}")
+        try:
+            response = self.supabase.table('popular').insert(rankings).execute()
+        except Exception as e:
+            raise Exception(f"Failed to insert rankings: {str(e)}")
 
     async def cleanup_orphaned_insights(self, session: aiohttp.ClientSession):
         """Cleanup orphaned insights"""
@@ -516,7 +469,7 @@ class AnalyticsWorker:
                 all_insights = data.get('results', [])
             
             # Fetch novels with insight IDs
-            novels_data = await self.fetch_novels(session)
+            novels_data = await self.fetch_novels()
             saved_insight_ids = set()
             
             for novel in novels_data:
