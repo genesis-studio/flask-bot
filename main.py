@@ -3,6 +3,8 @@ from discord.ext import commands
 from quart import Quart, jsonify, request
 import asyncio
 import os
+from discord.ext import tasks
+import aiohttp  # You'll need to install this: pip install aiohttp
 
 # Attempt to import praw
 try:
@@ -29,6 +31,7 @@ CHANNEL_IDS = {
 @bot.event
 async def on_ready():
     print(f'{bot.user} has connected to Discord!')
+    call_analytics.start()  # Start the scheduled task
 
 @app.route('/')
 async def index():
@@ -194,6 +197,34 @@ async def send_discord_message(channel_id, novel_title, chapter_number, chapter_
 
 #     # Wait for 1-0- minute(s) before the next potential post (to comply with rate limits)
 #     await asyncio.sleep(60)
+
+@tasks.loop(minutes=5)
+async def call_analytics():
+    """Call Supabase analytics function every 5 minutes"""
+    try:
+        async with aiohttp.ClientSession() as session:
+            headers = {
+                'Authorization': f'Bearer {os.environ.get("PUBLIC_SUPABASE_ANON_KEY")}',
+                'Content-Type': 'application/json'
+            }
+            data = {"name": "Functions"}
+            
+            async with session.post(
+                'https://api.genesistudio.com/functions/v1/analytics',
+                headers=headers,
+                json=data
+            ) as response:
+                if response.status == 200:
+                    print("Analytics function called successfully")
+                else:
+                    print(f"Analytics call failed with status: {response.status}")
+                    
+    except Exception as e:
+        print(f"Error calling analytics function: {e}")
+
+@call_analytics.before_loop
+async def before_analytics():
+    await bot.wait_until_ready()
 
 async def start_bot():
     await bot.start(os.environ["DISCORD_TOKEN"])
