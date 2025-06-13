@@ -340,6 +340,8 @@ class AnalyticsWorker:
                 'Content-Type': 'application/json'
             }
             
+            
+            print("Going to fetch insight data: ", f'https://app.posthog.com/api/projects/{self.posthog_project_id}/insights/?short_id={insight_id}&refresh=force_blocking')
             async with session.get(
                 f'https://app.posthog.com/api/projects/{self.posthog_project_id}/insights/?short_id={insight_id}&refresh=force_blocking',
                 headers=headers
