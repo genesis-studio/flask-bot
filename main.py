@@ -200,27 +200,17 @@ async def send_discord_message(channel_id, novel_title, chapter_number, chapter_
 
 @tasks.loop(minutes=5)
 async def call_analytics():
-    """Call Supabase analytics function every 5 minutes"""
+    """Run analytics worker every 5 minutes"""
     try:
-        async with aiohttp.ClientSession() as session:
-            headers = {
-                'Authorization': f'Bearer {os.environ.get("PUBLIC_SUPABASE_ANON_KEY")}',
-                'Content-Type': 'application/json'
-            }
-            data = {"name": "Functions"}
+        from analytics_worker import run_analytics_worker
+        result = await run_analytics_worker()
+        if result.get("success"):
+            print("Analytics worker completed successfully")
+        else:
+            print(f"Analytics worker failed: {result.get('error', 'Unknown error')}")
             
-            async with session.post(
-                'https://api.genesistudio.com/functions/v1/analytics',
-                headers=headers,
-                json=data
-            ) as response:
-                if response.status == 200:
-                    print("Analytics function called successfully")
-                else:
-                    print(f"Analytics call failed with status: {response.status}")
-                    
     except Exception as e:
-        print(f"Error calling analytics function: {e}")
+        print(f"Error running analytics worker: {e}")
 
 @call_analytics.before_loop
 async def before_analytics():
