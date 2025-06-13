@@ -331,7 +331,7 @@ class AnalyticsWorker:
 
     async def fetch_insight_data(self, insight_id: str, novel_id: str, insight_type: str, session: aiohttp.ClientSession):
         """Fetch insight data from PostHog"""
-        print(f"[FETCH_INSIGHT] Fetching {insight_type} data for novel {novel_id}")
+        print(f"[FETCH_INSIGHT] Fetching {insight_type} data for novel {novel_id} with insight id {insight_id}")
         
         try:
             headers = {
