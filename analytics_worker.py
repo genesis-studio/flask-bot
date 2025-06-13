@@ -207,7 +207,7 @@ class AnalyticsWorker:
                         result.get('value', {}).get('data') is not None and 
                         result.get('value', {}).get('data', {}).get('trend') is not None):
                         
-                        total_views = self.calculate_total_views(result['value']['data']['trend'])
+                        total_views = int(self.calculate_total_views(result['value']['data']['trend']))
                         if result['value']['type'] == 'overall':
                             novel_updates['total_views'] = total_views
                             print(f"[NOVEL] Updated overall views for {novel.novel_title}: {total_views}")
@@ -405,7 +405,7 @@ class AnalyticsWorker:
                     'novel_id': novel['id'],
                     'type': 'overall',
                     'ranking': index + 1,
-                    'metadata': {'total_views': novel.get('total_views', 0)}
+                    'metadata': {'total_views': int(novel.get('total_views', 0))}
                 })
             
             # Create weekly rankings if enabled
@@ -416,7 +416,7 @@ class AnalyticsWorker:
                         'novel_id': novel['id'],
                         'type': 'weekly',
                         'ranking': index + 1,
-                        'metadata': {'weekly_views': novel.get('page_views', 0)}
+                        'metadata': {'weekly_views': int(novel.get('page_views', 0))}
                     })
             
             # Batch insert rankings
