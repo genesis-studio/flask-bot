@@ -45,7 +45,12 @@ class AnalyticsWorker:
             raise ValueError("Missing required environment variables")
         
         # Initialize Supabase client
-        self.supabase: Client = create_client(self.supabase_url, self.supabase_anon_key)
+        try:
+            self.supabase: Client = create_client(self.supabase_url, self.supabase_anon_key)
+        except Exception as e:
+            print(f"[INIT] Error creating Supabase client: {e}")
+            # Try alternative initialization
+            self.supabase = None
         
         print(f"[INIT] Initialized with PostHog project ID: {self.posthog_project_id}")
 
