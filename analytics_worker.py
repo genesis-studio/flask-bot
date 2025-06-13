@@ -209,6 +209,7 @@ class AnalyticsWorker:
                 # Process results and update novel views
                 novel_updates = {}
                 for result in insight_results:
+                    print(f"[NOVEL] Result: {result}")
                     if result.get('status') == 'fulfilled' and result.get('value', {}).get('data', {}).get('trend'):
                         total_views = self.calculate_total_views(result['value']['data']['trend'])
                         if result['value']['type'] == 'overall':
