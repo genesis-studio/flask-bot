@@ -38,7 +38,7 @@ class AnalyticsWorker:
         self.supabase_url = os.environ.get('SUPABASE_URL')
         self.supabase_anon_key = os.environ.get('PUBLIC_SUPABASE_ANON_KEY')
         self.posthog_api_key = os.environ.get('POSTHOG_API_KEY')
-        self.posthog_project_id = os.environ.get('POSTHOG_PROJECT_ID')
+        self.posthog_project_id = os.environ.get('POSTHOG_PROJECT_ID').replace('=', '').replace(' ', '')
         
         if not all([self.supabase_url, self.supabase_anon_key, self.posthog_api_key, self.posthog_project_id]):
             raise ValueError("Missing required environment variables")
