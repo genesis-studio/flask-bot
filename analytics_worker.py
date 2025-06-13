@@ -36,7 +36,7 @@ class Chapter:
 class AnalyticsWorker:
     def __init__(self):
         self.supabase_url = os.environ.get('SUPABASE_URL')
-        self.supabase_anon_key = os.environ.get('SUPABASE_ANON_KEY')
+        self.supabase_anon_key = os.environ.get('PUBLIC_SUPABASE_ANON_KEY')
         self.posthog_api_key = os.environ.get('POSTHOG_API_KEY')
         self.posthog_project_id = os.environ.get('POSTHOG_PROJECT_ID')
         
