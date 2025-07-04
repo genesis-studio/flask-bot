@@ -113,7 +113,7 @@ async def send_discord_message(channel_id, novel_title, chapter_number, chapter_
             '41bf5bdf-226e-4dec-9397-0c4ae3e1e738': {'role_id': 1328001121054101504, 'color': discord.Color.from_rgb(171, 4, 0)},  # Son-In-Law
             '5afd565d-915c-4642-9489-94bd3fab1f9a': {'role_id': 1330567635989041182, 'color': discord.Color.from_rgb(145, 145, 145)},  # Tin grey color,
             '06ca3358-939b-4c09-b28e-796277b3ac96': {'role_id': 1337385463136387112, 'color': discord.Color.from_rgb(220, 93, 20)},  # Meta Characterrrrr
-            '0f9dcc3a-b908-453c-a037-964259c85cbe': {'role_id': 1219457467847544931, 'color': discord.Color.from_rgb(133, 223, 204)},  # Weakened Professor
+            '0f9dcc3a-b908-453c-a037-964259c85cbe': {'role_id': 1361681783195959306, 'color': discord.Color.from_rgb(133, 223, 204)},  # Weakened Professor
             '43a2f5cb-171a-40b4-8090-9160fb5808a3': {'role_id': 1374229523024973914, 'color': discord.Color.from_rgb(23, 78, 83)},  # Porter
             # 'c5307a93-6aee-4f20-b870-e9dcf10ab455': {'role_id': , 'color': discord.Color.from_rgb(0, 0, 0)},  # holy necromancer
         }
