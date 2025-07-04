@@ -116,6 +116,7 @@ async def send_discord_message(channel_id, novel_title, chapter_number, chapter_
             '0f9dcc3a-b908-453c-a037-964259c85cbe': {'role_id': 1361681783195959306, 'color': discord.Color.from_rgb(133, 223, 204)},  # Weakened Professor
             '43a2f5cb-171a-40b4-8090-9160fb5808a3': {'role_id': 1374229523024973914, 'color': discord.Color.from_rgb(23, 78, 83)},  # Porter
             # 'c5307a93-6aee-4f20-b870-e9dcf10ab455': {'role_id': , 'color': discord.Color.from_rgb(0, 0, 0)},  # holy necromancer
+            '7f235e90-2098-4a04-a85e-f9275426e681': {'role_id': 1390708548740321300, 'color': discord.Color.from_str('#ef9361')},  # My Dad Is The Zenith
         }
         
         role_info = role_map.get(novel_id, {})
