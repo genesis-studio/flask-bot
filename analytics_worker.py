@@ -12,7 +12,7 @@ BASE_URL = "https://genesistudio.com"
 VIEWER_BASE_URL = f"{BASE_URL}/viewer"
 
 # Feature flags
-ENABLE_ORPHANED_INSIGHTS_CLEANUP = False
+ENABLE_ORPHANED_INSIGHTS_CLEANUP = True
 ENABLE_WEEKLY_UPDATES = False  # Toggle for weekly insights
 MAX_CONCURRENT_REQUESTS = 5  # Limit concurrent PostHog requests
 BATCH_SIZE = 10  # Process novels in batches
