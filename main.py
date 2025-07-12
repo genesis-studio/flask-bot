@@ -5,6 +5,7 @@ import asyncio
 import os
 from discord.ext import tasks
 import aiohttp  # You'll need to install this: pip install aiohttp
+from supabase import create_client, Client
 
 # Attempt to import praw
 try:
@@ -22,11 +23,36 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 # Quart app setup
 app = Quart(__name__)
 
+# Supabase setup
+supabase_url = os.environ.get('SUPABASE_URL')
+supabase_anon_key = os.environ.get('PUBLIC_SUPABASE_ANON_KEY')
+supabase: Client = create_client(supabase_url, supabase_anon_key)
+
 # Discord channel IDs (replace with your actual channel IDs)
 CHANNEL_IDS = {
     'test-release':1262212983426125835,
     'release': 1219457468011380892
 }
+
+def hex_to_rgb(hex_color):
+    """Convert hex color to RGB tuple"""
+    hex_color = hex_color.lstrip('#')
+    return tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
+
+async def get_novel_role_info(novel_id):
+    """Fetch role info for a novel from Supabase"""
+    try:
+        response = supabase.table('novel_roles').select('role,hex').eq('novel', novel_id).execute()
+        if response.data:
+            data = response.data[0]
+            return {
+                'role_id': int(data['role']),
+                'color': hex_to_rgb(data['hex'])
+            }
+        return None
+    except Exception as e:
+        print(f"Error fetching novel role info: {e}")
+        return None
 
 @bot.event
 async def on_ready():
@@ -76,52 +102,17 @@ async def send_message():
 async def send_discord_message(channel_id, novel_title, chapter_number, chapter_title, chapter_id, free_chapter_number, free_chapter_title, free_chapter_id, novel_id, cover_id, abbreviation):
     channel = bot.get_channel(channel_id)
     if channel:
-        # Define novel_id to role_id and color mapping
-        role_map = {
-            '0c09a384-dc9f-474d-a1c5-f2c65f68a5ab': {'role_id': 1219457467847544932, 'color': discord.Color.from_rgb(153, 170, 181)},  # The Lone SF Transmigrator in the Otherworld Forum
-            '1476685b-badc-4fe1-a962-5517f4b23363': {'role_id': 1219457467793145959, 'color': discord.Color.from_rgb(192, 192, 192)},  # Civil Servant in Romance Fantasy
-            '222a1192-5471-48a5-a22c-d5277ba03df8': {'role_id': 1219457467793145963, 'color': discord.Color.from_rgb(141, 57, 255)},  # I Became The Necromancer Of The Academy
-            '3135a8c6-f426-4eca-9c9e-2c5011766f81': {'role_id': 1219457467847544924, 'color': discord.Color.from_rgb(67, 100, 255)},  # I Am This Murim's Crazy Bitch
-            # '3bc6a1f0-2b1b-4ee6-a377-13be0bc67b87': {'role_id': 1219457467872968742, 'color': discord.Color.from_rgb(212, 238, 15)},  # The Regressor and the Blind Saint
-            # '3fecc06f-57f1-4f6e-8fff-cf109de39e88': {'role_id': 1219457467793145962, 'color': discord.Color.from_rgb(212, 99, 193)},  # I Unknowingly Rejected My Favorite
-            '4db280ca-8ce5-4464-afc7-2079c17e6d5e': {'role_id': 1219457467872968747, 'color': discord.Color.from_rgb(255, 0, 4)},  # Escaping the Mystery Hotel
-            '5535a77a-9375-4882-8766-8388348abc4c': {'role_id': 1219457467847544931, 'color': discord.Color.from_rgb(133, 223, 204)},  # The Academy's Weakest Became A Demon-Limited Hunter
-            '6468040e-a86a-44f8-a14a-7067418fe0a1': {'role_id': 1219457467872968743, 'color': discord.Color.from_rgb(218, 214, 47)},  # Omniscient First-Person's Viewpoint
-            '69c2c3c2-ae68-46e7-97d2-b1868b05adc1': {'role_id': 1219457467872968746, 'color': discord.Color.from_rgb(211, 22, 42)},  # Fated To Be Loved By Villains
-            '69d6ab1d-4da5-4e84-8ffb-190308540908': {'role_id': 1219457467847544929, 'color': discord.Color.from_rgb(62, 226, 159)},  # Seoul Object Story
-            '827757d8-161c-441b-8240-f4dbd7407ce4': {'role_id': 1219457467793145965, 'color': discord.Color.from_rgb(164, 114, 230)},  # My Daughters Are Regressors
-            '8da58504-bee5-4807-804a-23215c8a4e7e': {'role_id': 1219457467847544930, 'color': discord.Color.from_rgb(26, 188, 156)},  # City of Witches
-            # '94683b45-439b-424a-b7f6-76154bcd8750': {'role_id': 1219457467847544923, 'color': discord.Color.from_rgb(13, 108, 223)},  # Pseudo Resident's Illegal Stay in Another World
-            '9fe66022-d209-4d2c-9397-beb256982883': {'role_id': 1244241518437601321, 'color': discord.Color.from_rgb(230, 126, 34)},  # Transmigrated Into A Tragic Romance Fantasy
-            'a7e499f7-fa6b-4d86-8ee6-1bf6772890f5': {'role_id': 1219457467872968744, 'color': discord.Color.from_rgb(246, 186, 16)},  # Childhood Friend of the Zenith
-            'b92c8a56-9538-42e5-9428-0d55a0e1becc': {'role_id': 1219457467793145957, 'color': discord.Color.from_rgb(87, 87, 109)},  # The Heaven-Slaying Sword
-            'c0018319-9173-4cc8-9aed-27db5b33fbd0': {'role_id': 1219457467675836435, 'color': discord.Color.from_rgb(17, 16, 16)},  # Becoming Professor Moriarty's Probability
-            'cd2b58ae-61d3-4cac-9801-2f51e7ec9832': {'role_id': 1266038045111488636, 'color': discord.Color.from_str('#243057')},  # I Will Stage A Coup D'état
-            'd63886fd-b00b-426c-ba94-f5f7186c89d9': {'role_id': 1244241901616627773, 'color': discord.Color.from_rgb(32, 102, 148)},  # The Magic Academy's Physicist
-            'e1ee79a1-35f4-40e4-8c0d-f54cb6e1be81': {'role_id': 1219457467847544928, 'color': discord.Color.from_rgb(46, 204, 113)},  # The Villain Who Robbed the Heroines
-            'e5cd1c8b-af3d-4975-8166-8865092d2a6a': {'role_id': 1219457467847544927, 'color': discord.Color.from_rgb(140, 234, 246)},  # The Main Heroines are Trying to Kill Me
-            'f1cc7b93-ba56-4cf0-9d33-26e62e17c395': {'role_id': 1219457467793145964, 'color': discord.Color.from_rgb(113, 54, 138)},  # Otherworld TRPG Game Master
-            'fb2cfad1-9b49-40be-83f5-8cbcd706b0bf': {'role_id': 1219457467793145961, 'color': discord.Color.from_rgb(185, 20, 226)},  # A Love Letter From The Future
-            '6bd89693-9b52-486d-8239-1174bab2f14d': {'role_id': 1270002466536296570, 'color': discord.Color.from_rgb(142, 14, 10)},  # A Love Letter From The Future
-            '659953bd-5229-457b-85a2-3252758f5ae2': {'role_id': 1280514452655181874, 'color': discord.Color.from_rgb(75, 255, 87)},  # Training-Addicted Mage
-            'd982a380-b96a-4d38-a2a9-9c4aa18d8570': {'role_id': 1281334118566858812, 'color': discord.Color.from_rgb(253, 255, 153)},  # Forsaken Priest
-            '38d35afc-8fb1-412e-9818-9f9f3e0bd1c1': {'role_id': 1278204780421845004, 'color': discord.Color.from_rgb(66, 0, 114)},  # Freed Slaves
-            '7aec4e03-4c3d-4890-acfc-31192d133b95': {'role_id': 1281795492166242334, 'color': discord.Color.from_rgb(0, 191, 201)}, # 30 Years After Reincarnating
-            '8309d7bf-b359-431e-9e5e-a8cc738c81c9': {'role_id': 1307034721758478357, 'color': discord.Color.from_rgb(248, 131, 121)}, # Martial Arts Ain't Anything
-            '78886d07-3f97-4ff4-93e5-45651c43c1af': {'role_id': 1309727818845786166, 'color': discord.Color.from_rgb(255, 215, 0)}, # The Barbarian Writer of a Murim Dating Sim
-            '3a6bf66a-1a24-444c-958f-52fb2fc36ec8': {'role_id': 1322214156811767898, 'color': discord.Color.from_rgb(229, 43, 80)},  # Make Dark Fantasy Great Again
-            '41bf5bdf-226e-4dec-9397-0c4ae3e1e738': {'role_id': 1328001121054101504, 'color': discord.Color.from_rgb(171, 4, 0)},  # Son-In-Law
-            '5afd565d-915c-4642-9489-94bd3fab1f9a': {'role_id': 1330567635989041182, 'color': discord.Color.from_rgb(145, 145, 145)},  # Tin grey color,
-            '06ca3358-939b-4c09-b28e-796277b3ac96': {'role_id': 1337385463136387112, 'color': discord.Color.from_rgb(220, 93, 20)},  # Meta Characterrrrr
-            '0f9dcc3a-b908-453c-a037-964259c85cbe': {'role_id': 1361681783195959306, 'color': discord.Color.from_rgb(133, 223, 204)},  # Weakened Professor
-            '43a2f5cb-171a-40b4-8090-9160fb5808a3': {'role_id': 1374229523024973914, 'color': discord.Color.from_rgb(23, 78, 83)},  # Porter
-            # 'c5307a93-6aee-4f20-b870-e9dcf10ab455': {'role_id': , 'color': discord.Color.from_rgb(0, 0, 0)},  # holy necromancer
-            '7f235e90-2098-4a04-a85e-f9275426e681': {'role_id': 1390708548740321300, 'color': discord.Color.from_str('#ef9361')},  # My Dad Is The Zenith
-        }
+        # Fetch role info from Supabase
+        role_info = await get_novel_role_info(novel_id)
         
-        role_info = role_map.get(novel_id, {})
-        role_id = role_info.get('role_id')
-        embed_color = role_info.get('color', discord.Color.default())
+        role_id = None
+        embed_color = discord.Color.default()
+        
+        if role_info:
+            role_id = role_info.get('role_id')
+            color_rgb = role_info.get('color')
+            if color_rgb:
+                embed_color = discord.Color.from_rgb(*color_rgb)
         
         role = None
         if role_id:
