@@ -108,7 +108,7 @@ class AnalyticsWorker:
     async def fetch_novels(self) -> List[Dict]:
         """Fetch novels from Supabase"""
         try:
-            response = self.supabase.table('novels').select('id,abbreviation,insight_id,insight_id_weekly,novel_title,total_views,page_views,status,serialization').eq('status', 'published').execute()
+            response = self.supabase.table('novels').select('id,abbreviation,insight_id,insight_id_weekly,novel_title,total_views,page_views,status,serialization').eq('status', 'published').eq('old', False).execute()
             return response.data
         except Exception as e:
             raise Exception(f"Error fetching novels: {str(e)}")
@@ -293,8 +293,8 @@ class AnalyticsWorker:
                         "series": [
                             {
                                 "kind": "EventsNode",
-                                "event": "$pageview",
-                                "name": "$pageview",
+                                "event": "chapter_viewed",
+                                "name": "chapter_viewed",
                                 "math": "total"
                             }
                         ],
@@ -438,7 +438,7 @@ class AnalyticsWorker:
     async def fetch_novels_for_ranking(self):
         """Fetch novels for ranking"""
         try:
-            response = self.supabase.table('novels').select('id,total_views,page_views').eq('status', 'published').execute()
+            response = self.supabase.table('novels').select('id,total_views,page_views').eq('status', 'published').eq('old', False).execute()
             return response.data
         except Exception as e:
             raise Exception(f"Failed to fetch novels for ranking: {str(e)}")
